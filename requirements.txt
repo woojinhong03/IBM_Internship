@@ -1,0 +1,5 @@
+ibm_watsonx_ai
+gradio
+langchain>=0.3,<0.4
+langchain_ibm>=0.3,<0.4
+python-dotenv
