@@ -182,12 +182,12 @@ def build_app():
         with gr.Tabs():
             # Vote 탭
             with gr.Tab("Vote"):
-                gr.Markdown("## test1 \n"
-                            "### - Guide-line \n"
-                            "### - 1. 다음라운드 확인 버튼을 누르시면 새로 질문을 작성 하셔야 합니다.\n"
-                            "### - 2. 최종모델 확정 버튼을 누르면 언제든지 최종모델을 확정할 수 있으며, 처음부터 다시 진행해야합니다.\n"
-                            "### - 3. 버튼을 눌러서 자유롭게 업/다운 상태변환을 할 수 있습니다.\n"
-                            "### - 4. 꼭 최종선택 버튼을 눌러야 점수가 누적됩니다. 더블클릭 하지마세요.")
+                gr.Markdown("# 2025 Winter P-Tech Team1 LLM Test Page \n"
+                            "## Guide-line \n"
+                            "### - 원하는 시스템 프롬프트를 입력하세요. 그냥 진행 하셔도 됩니다.\n"
+                            "### - 질문을 보낸 후 답변을 기준으로 평가하세요.\n"
+                            "### - 업/다운 상태 변환을 통하여 자유롭게 평가 할 수 있습니다.\n"
+                            "### - 최종 선택 버튼을 클릭 시 제출됩니다.")
                 with gr.Row():
                     systemp = gr.Textbox(label="시스템 프로젝트를를 입력하세요", lines=1, value="""Do not generate explicit, violent, or illegal content.
 Avoid discussions on sensitive personal data.
