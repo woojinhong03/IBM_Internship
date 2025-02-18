@@ -268,7 +268,7 @@ def build_app():
                             "### - 최종 선택 버튼을 클릭 시 제출됩니다.")
                 with gr.Row():
                     user_question = gr.Textbox(label="질문을 입력하세요", lines=1)
-                    systemp = gr.Textbox(label="시스템 프로젝트를를 입력하세요", lines=1)
+                    systemp = gr.Textbox(label="추가할 시스템 프로젝트를 입력하세요", lines=1)
                 submit_btn = gr.Button("질문 보내기")
 
                 with gr.Row():
@@ -297,7 +297,7 @@ def build_app():
             with gr.Tab("Leaderboard"):
                 gr.Markdown("## 리더보드 화면 (Scoreboard)")
                 # States
-                init_models = ["Model_A","Model_B","Model_C","Model_D"]
+                init_models = ["Model_A : gemini-1.5-flash","Model_B : ibm/granite-3-8b-instruct","Model_C : ibm/granite-3-2-8b-instruct-preview-rc","Model_D : meta-llama/llama-3-1-8b-instruct"]
                 active_models_state = gr.State(init_models)
                 vote_state = gr.State({m:"down" for m in init_models})
                 final_series_state = gr.State(pd.Series([], dtype=object))
