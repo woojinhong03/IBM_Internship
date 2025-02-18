@@ -1,7 +1,68 @@
 # -*- coding: utf-8 -*-
 import gradio as gr
 import pandas as pd
+from dotenv import load_dotenv
 import os
+
+#IBM_Cloud##########################################################################
+from ibm_watsonx_ai.metanames import GenTextParamsMetaNames as GenParams
+from ibm_watsonx_ai.foundation_models.utils.enums import DecodingMethods
+from ibm_watsonx_ai import Credentials
+from ibm_watsonx_ai import APIClient
+from ibm_watsonx_ai.foundation_models import ModelInference
+
+Watsonx_ai_url = 'https://us-south.ml.cloud.ibm.com'
+
+load_dotenv()
+IBM_Cloud_API = os.getenv('api_key')
+IBM_Project_ID = os.getenv('project_id')
+
+
+def IBM_LLMS(systemp,DATA):
+  ibm_model = "ibm/granite-3-8b-instruct"
+  ibm_models=['ibm/granite-3-8b-instruct','ibm/granite-3-2-8b-instruct-preview-rc','meta-llama/llama-3-1-8b-instruct']
+  Pindex=0 if ibm_models.index(ibm_model)<=1 else ibm_models.index(ibm_model)-1
+  credentials = Credentials(
+    url=Watsonx_ai_url,
+    api_key=IBM_Cloud_API,
+  )
+  parameters = {
+    GenParams.DECODING_METHOD: DecodingMethods.SAMPLE.value,
+    GenParams.MAX_NEW_TOKENS: 1000,
+    GenParams.MIN_NEW_TOKENS: 1,
+    GenParams.TEMPERATURE: 0.5,
+    GenParams.TOP_K: 50,
+    GenParams.TOP_P: 1
+}
+  model = ModelInference(
+    model_id = ibm_model,
+    params = parameters,
+    credentials = credentials,
+    project_id = IBM_Project_ID,
+    )
+  # 기본 시스템 프롬프트 정의
+  prompt_inputs = [f"""
+<|start_of_role|>system<|end_of_role|>Knowledge Cutoff Date: April 2024.
+Today's Date: December 16, 2024.
+You are Granite, developed by IBM. You are a helpful AI assistant with access to the following tools. When a tool is required to answer the user's query, respond with <|tool_call|> followed by a JSON list of tools used. If a tool does not exist in the provided list of tools, notify the user that you do not have the ability to fulfill the request.
+Answer questions briefly and do not provide unnecessary explanation.
+You are a Korean model, SO ANSWER IN KOREAN.
+User question:{DATA}
+User answer:<|end_of_text|>""",f"""<|start_header_id|>system<|end_header_id|>
+You always answer the questions with markdown formatting using GitHub syntax. The markdown formatting you support: headings, bold, italic, links, tables, lists, code blocks, and blockquotes. You must omit that you answer the questions with markdown.
+Any HTML tags must be wrapped in block quotes, for example ```<html>```. You will be penalized for not rendering code in block quotes.
+When returning code blocks, specify language.
+You are a helpful, respectful and honest assistant. Always answer as helpfully as possible, while being safe.
+Your answers should not include any harmful, unethical, racist, sexist, toxic, dangerous, or illegal content. Please ensure that your responses are socially unbiased and positive in nature.
+If a question does not make any sense, or is not factually coherent, explain why instead of answering something not correct. If you don't know the answer to a question, please don't share false information.<|eot_id|><|start_header_id|>user<|end_header_id|>
+Only answer questions concisely.
+You are a Korean model, SO ANSWER IN KOREAN.
+Don't fill in the format.
+User question:{DATA}
+User answer:<|eot_id|><|start_header_id|>assistant<|end_header_id|>"""]
+
+  generated_response = model.generate_text(prompt=prompt_inputs[Pindex], guardrails=False)
+  return (f"{generated_response}")
 
 
 #Google Gemini######################################################################
@@ -9,6 +70,7 @@ import google.generativeai as genai
 Google_Gemini_API = os.getenv('google_api_key')
 
 def GOOGLE_LLM(systemp, DATA):
+
   SYSTEM_PROMPT = systemp
 
   genai.configure(api_key=Google_Gemini_API)
@@ -18,7 +80,7 @@ def GOOGLE_LLM(systemp, DATA):
 
   return list(res)[0].strip('\n?')
 
-
+#Google Gemini######################################################################
 
 ####################################
 # (A) 가상 모델 응답
@@ -31,7 +93,8 @@ def simulate_model_responses(systemp, question, model_list):
     for m in model_list:
         # responses[m] = f"{m}의 답변: '{question}' 에 대한 가상 응답."
         
-        responses[m] = GOOGLE_LLM(systemp, question)
+        # responses[m] = GOOGLE_LLM(systemp, question)
+        responses[m] = IBM_LLMS(systemp, question)
         
     return responses
 
@@ -189,15 +252,7 @@ def build_app():
                             "### - 업/다운 상태 변환을 통하여 자유롭게 평가 할 수 있습니다.\n"
                             "### - 최종 선택 버튼을 클릭 시 제출됩니다.")
                 with gr.Row():
-                    systemp = gr.Textbox(label="시스템 프로젝트를를 입력하세요", lines=1, value="""Do not generate explicit, violent, or illegal content.
-Avoid discussions on sensitive personal data.
-Refrain from engaging in political, religious, or controversial debates unless purely factual and neutral.
-**Follow Instructions Precisely**: Adhere to user instructions carefully while maintaining coherence and quality.
-**Ask for Clarification When Necessary**: If a request is ambiguous, prompt the user for more details.
-**Context Awareness**: Remember previous parts of the conversation and provide relevant, contextually appropriate responses.
-**Provide Citations When Required**: If a user asks for factual claims, include references or recommend authoritative sources.
-**Do not use English when answering, use Korean.**
-""")
+                    systemp = gr.Textbox(label="시스템 프로젝트를를 입력하세요", lines=1)
                     user_question = gr.Textbox(label="질문을 입력하세요", lines=1)
                 submit_btn = gr.Button("질문 보내기")
 
