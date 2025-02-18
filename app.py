@@ -115,17 +115,26 @@ def simulate_model_responses(systemp, question, model_list):
 # (B) 업/다운 토글
 ####################################
 def toggle_vote(vote_state, model):
-    """
-    - vote_state = { "Model_A": "down"/"up", ... }
-    - 클릭 시 현재 상태를 토글, 버튼 라벨 반영
-    """
-    current = vote_state.get(model, "down")
-    new_val = "up" if current == "down" else "down"
+#     """
+#     - vote_state = { "Model_A": "down"/"up", ... }
+#     - 클릭 시 현재 상태를 토글, 버튼 라벨 반영
+#     """
+#     current = vote_state.get(model, "down")
+#     new_val = "up" if current == "down" else "down"
+#     vote_state[model] = new_val
+
+#     emoji = "👍" if new_val == "up" else "👎"
+#     label = f"{model} ({emoji})"
+#     return vote_state, label
+    current = vote_state.get(model, "❌")  # 기본값을 "X"로 설정
+    new_val = "⭕" if current == "❌" else "❌"  # O/X로 토글
     vote_state[model] = new_val
 
-    emoji = "👍" if new_val == "up" else "👎"
+    emoji = "⭕" if new_val == "⭕" else "❌"  # O/X 이모지로 변경
     label = f"{model} ({emoji})"
+    
     return vote_state, label
+
 
 ####################################
 # (C) 질문 보내기
@@ -149,30 +158,45 @@ def submit_question(systemp, question, active_models, vote_state):
 ####################################
 def next_round_and_auto_finalize(vote_state, active_models):
     model_match = {"Model_A":'gemini-1.5-flash', "Model_B":'ibm/granite-3-8b-instruct',"Model_C":'ibm/granite-3-2-8b-instruct-preview-rc',"Model_D":'meta-llama/llama-3-1-8b-instruct'}
-    up_models = [m for m in active_models if vote_state.get(m,"down")=="up"]
+    # up_models = [m for m in active_models if vote_state.get(m,"down")=="up"]
+    up_models = [m for m in active_models if vote_state.get(m, "❌") == "⭕"]
     auto_final = False
     final_msg = ""
     final_series = pd.Series([], dtype=object)
 
-    if len(up_models)==0:
-        round_msg = "현재 라운드에서 업(👍)된 모델이 없습니다. 모두 탈락."
+    # if len(up_models)==0:
+    #     round_msg = "현재 라운드에서 업(👍)된 모델이 없습니다. 모두 탈락."
+    #     new_models = []
+    # elif len(up_models)==1:
+    #     only_m = up_models[0]
+    #     round_msg = f"'{only_m}' 한 개만 업(👍) => 자동 최종 확정!"
+    #     final_msg = f"최종 모델은 '{model_match[only_m]}'입니다!"
+    #     final_series = pd.Series([only_m])
+    #     auto_final = True
+    #     new_models = [only_m]
+    # else:
+    #     round_msg = f"업(👍)된 모델: {up_models}"
+    #     new_models = up_models
+    
+    if len(up_models) == 0:
+        round_msg = "현재 라운드에서 '⭕'된 모델이 없습니다. 모두 탈락."
         new_models = []
-    elif len(up_models)==1:
+    elif len(up_models) == 1:
         only_m = up_models[0]
-        round_msg = f"'{only_m}' 한 개만 업(👍) => 자동 최종 확정!"
+        round_msg = f"'{only_m}' 한 개만 '⭕' => 자동 최종 확정!"
         final_msg = f"최종 모델은 '{model_match[only_m]}'입니다!"
         final_series = pd.Series([only_m])
         auto_final = True
         new_models = [only_m]
     else:
-        round_msg = f"업(👍)된 모델: {up_models}"
+        round_msg = f"'⭕'된 모델: {up_models}"
         new_models = up_models
 
     hideA = gr.update(visible=("Model_A" in new_models))
     hideB = gr.update(visible=("Model_B" in new_models))
     hideC = gr.update(visible=("Model_C" in new_models))
     hideD = gr.update(visible=("Model_D" in new_models))
-
+    
     show_restart = gr.update(visible=auto_final)
 
     return (
@@ -205,7 +229,8 @@ def finalize_models_score(vote_state, active_models, score_dict):
     """
     업된 모델들 => 최종 확정 => 점수 반영
     """
-    ups = [m for m in active_models if vote_state.get(m,"down")=="up"]
+    # ups = [m for m in active_models if vote_state.get(m,"down")=="up"]
+    ups = [m for m in active_models if vote_state.get(m, "❌") == "⭕"]
     final_series = pd.Series(ups, dtype=object)
 
     if len(ups) == 0:
@@ -274,16 +299,16 @@ def build_app():
                 with gr.Row():
                     with gr.Column(elem_id="colA") as colA:
                         respA = gr.Textbox(label="Model_A 응답", lines=1, interactive=False)
-                        toggleA = gr.Button("Model_A (👎)")
+                        toggleA = gr.Button("Model_A (❌)")
                     with gr.Column(elem_id="colB") as colB:
                         respB = gr.Textbox(label="Model_B 응답", lines=1, interactive=False)
-                        toggleB = gr.Button("Model_B (👎)")
+                        toggleB = gr.Button("Model_B (❌)")
                     with gr.Column(elem_id="colC") as colC:
                         respC = gr.Textbox(label="Model_C 응답", lines=1, interactive=False)
-                        toggleC = gr.Button("Model_C (👎)")
+                        toggleC = gr.Button("Model_C (❌)")
                     with gr.Column(elem_id="colD") as colD:
                         respD = gr.Textbox(label="Model_D 응답", lines=1, interactive=False)
-                        toggleD = gr.Button("Model_D (👎)")
+                        toggleD = gr.Button("Model_D (❌)")
                 
                 round_msg = gr.Textbox(label="라운드 안내", lines=2, interactive=False)
                 round_btn = gr.Button("라운드 한번 더 진행")
@@ -294,12 +319,13 @@ def build_app():
                 restart_btn = gr.Button("처음부터 다시 시작", visible=False)
 
             # Leaderboard 탭
-            with gr.Tab("Leaderboard"):
-                gr.Markdown("## 리더보드 화면 (Scoreboard)")
+            with gr.Tab("Your Leaderboard"):
+                gr.Markdown("## 나만의 리더보드 화면 (Scoreboard)")
                 # States
                 init_models = ["Model_A","Model_B","Model_C","Model_D"]
                 active_models_state = gr.State(init_models)
-                vote_state = gr.State({m:"down" for m in init_models})
+                # vote_state = gr.State({m:"down" for m in init_models})
+                vote_state = gr.State({m: "❌" for m in init_models})  # 기본값 "X"
                 final_series_state = gr.State(pd.Series([], dtype=object))
                 auto_finalized_state = gr.State(False)
 
@@ -312,7 +338,7 @@ def build_app():
                 interactive=False
               )
                 scoreboard_df
-                gr.Markdown("모델별 점수를 여기서 확인하세요. 투표는 Vote 탭에서 진행 가능합니다.")
+                gr.Markdown("당신이 테스트한 점수를 여기서 확인하세요. 투표는 Vote 탭에서 진행 가능합니다.")
 
         # (1) 질문 보내기
         submit_btn.click(
@@ -322,11 +348,16 @@ def build_app():
         )
 
         # (2) 업/다운 토글
-        toggleA.click(fn=lambda vs:toggle_vote(vs,"Model_A"), inputs=[vote_state], outputs=[vote_state, toggleA])
-        toggleB.click(fn=lambda vs:toggle_vote(vs,"Model_B"), inputs=[vote_state], outputs=[vote_state, toggleB])
-        toggleC.click(fn=lambda vs:toggle_vote(vs,"Model_C"), inputs=[vote_state], outputs=[vote_state, toggleC])
-        toggleD.click(fn=lambda vs:toggle_vote(vs,"Model_D"), inputs=[vote_state], outputs=[vote_state, toggleD])
-
+        # toggleA.click(fn=lambda vs:toggle_vote(vs,"Model_A"), inputs=[vote_state], outputs=[vote_state, toggleA])
+        # toggleB.click(fn=lambda vs:toggle_vote(vs,"Model_B"), inputs=[vote_state], outputs=[vote_state, toggleB])
+        # toggleC.click(fn=lambda vs:toggle_vote(vs,"Model_C"), inputs=[vote_state], outputs=[vote_state, toggleC])
+        # toggleD.click(fn=lambda vs:toggle_vote(vs,"Model_D"), inputs=[vote_state], outputs=[vote_state, toggleD])
+        toggleA.click(fn=lambda vs: toggle_vote(vs, "Model_A"), inputs=[vote_state], outputs=[vote_state, toggleA])
+        toggleB.click(fn=lambda vs: toggle_vote(vs, "Model_B"), inputs=[vote_state], outputs=[vote_state, toggleB])
+        toggleC.click(fn=lambda vs: toggle_vote(vs, "Model_C"), inputs=[vote_state], outputs=[vote_state, toggleC])
+        toggleD.click(fn=lambda vs: toggle_vote(vs, "Model_D"), inputs=[vote_state], outputs=[vote_state, toggleD])
+        
+        
         # (3) 라운드 진행
         round_btn.click(
             fn=next_round_and_auto_finalize,
