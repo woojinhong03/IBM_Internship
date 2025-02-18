@@ -297,7 +297,7 @@ def build_app():
             with gr.Tab("Leaderboard"):
                 gr.Markdown("## 리더보드 화면 (Scoreboard)")
                 # States
-                init_models = ["Model_A : gemini-1.5-flash","Model_B : ibm/granite-3-8b-instruct","Model_C : ibm/granite-3-2-8b-instruct-preview-rc","Model_D : meta-llama/llama-3-1-8b-instruct"]
+                init_models = ["Model_A","Model_B","Model_C","Model_D"]
                 active_models_state = gr.State(init_models)
                 vote_state = gr.State({m:"down" for m in init_models})
                 final_series_state = gr.State(pd.Series([], dtype=object))
