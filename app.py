@@ -262,13 +262,13 @@ def build_app():
             with gr.Tab("Vote"):
                 gr.Markdown("# 2025 Winter P-Tech Team1 LLM Test Page \n"
                             "## Guide-line \n"
-                            "### - 원하는 시스템 프롬프트를 입력하세요. 그냥 진행 하셔도 됩니다.\n"
+                            "### - 추가 할 시스템 프롬프트를 입력하세요. 그냥 진행 하셔도 됩니다.\n"
                             "### - 질문을 보낸 후 답변을 기준으로 평가하세요.\n"
                             "### - 업/다운 상태 변환을 통하여 자유롭게 평가 할 수 있습니다.\n"
                             "### - 최종 선택 버튼을 클릭 시 제출됩니다.")
                 with gr.Row():
-                    systemp = gr.Textbox(label="시스템 프로젝트를를 입력하세요", lines=1)
                     user_question = gr.Textbox(label="질문을 입력하세요", lines=1)
+                    systemp = gr.Textbox(label="시스템 프로젝트를를 입력하세요", lines=1)
                 submit_btn = gr.Button("질문 보내기")
 
                 with gr.Row():
