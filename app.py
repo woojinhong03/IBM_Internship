@@ -8,7 +8,6 @@ import os
 from ibm_watsonx_ai.metanames import GenTextParamsMetaNames as GenParams
 from ibm_watsonx_ai.foundation_models.utils.enums import DecodingMethods
 from ibm_watsonx_ai import Credentials
-from ibm_watsonx_ai import APIClient
 from ibm_watsonx_ai.foundation_models import ModelInference
 
 Watsonx_ai_url = 'https://us-south.ml.cloud.ibm.com'
@@ -18,51 +17,57 @@ IBM_Cloud_API = os.getenv('api_key')
 IBM_Project_ID = os.getenv('project_id')
 
 
-def IBM_LLMS(systemp,DATA):
-  ibm_model = "ibm/granite-3-8b-instruct"
-  ibm_models=['ibm/granite-3-8b-instruct','ibm/granite-3-2-8b-instruct-preview-rc','meta-llama/llama-3-1-8b-instruct']
-  Pindex=0 if ibm_models.index(ibm_model)<=1 else ibm_models.index(ibm_model)-1
-  credentials = Credentials(
-    url=Watsonx_ai_url,
-    api_key=IBM_Cloud_API,
-  )
-  parameters = {
-    GenParams.DECODING_METHOD: DecodingMethods.SAMPLE.value,
-    GenParams.MAX_NEW_TOKENS: 1000,
-    GenParams.MIN_NEW_TOKENS: 1,
-    GenParams.TEMPERATURE: 0.5,
-    GenParams.TOP_K: 50,
-    GenParams.TOP_P: 1
-}
-  model = ModelInference(
-    model_id = ibm_model,
-    params = parameters,
-    credentials = credentials,
-    project_id = IBM_Project_ID,
+def IBM_LLMS(ibm_model,systemp,DATA):
+	# ibm_model = 'ibm/granite-3-8b-instruct'
+	ibm_models=['ibm/granite-3-8b-instruct','ibm/granite-3-2-8b-instruct-preview-rc','meta-llama/llama-3-1-8b-instruct']
+	Pindex=0 if ibm_models.index(ibm_model)<=1 else ibm_models.index(ibm_model)-1
+	credentials = Credentials(
+    	url=Watsonx_ai_url,
+    	api_key=IBM_Cloud_API,
+	)
+	parameters = {
+		GenParams.DECODING_METHOD: DecodingMethods.SAMPLE.value,
+    	GenParams.MAX_NEW_TOKENS: 1000,
+    	GenParams.MIN_NEW_TOKENS: 1,
+    	GenParams.TEMPERATURE: 0.5,
+    	GenParams.TOP_K: 50,
+    	GenParams.TOP_P: 1
+	}
+	model = ModelInference(
+    	model_id = ibm_model,
+    	params = parameters,
+    	credentials = credentials,
+    	project_id = IBM_Project_ID,
     )
-  # 기본 시스템 프롬프트 정의
-  prompt_inputs = [f"""
-<|start_of_role|>system<|end_of_role|>Knowledge Cutoff Date: April 2024.
+# 기본 시스템 프롬프트 정의
+	prompt_inputs = [f"""
+<|start_of_role|>system<|end_of_role|>
+Knowledge Cutoff Date: April 2024.
 Today's Date: December 16, 2024.
 You are Granite, developed by IBM. You are a helpful AI assistant with access to the following tools. When a tool is required to answer the user's query, respond with <|tool_call|> followed by a JSON list of tools used. If a tool does not exist in the provided list of tools, notify the user that you do not have the ability to fulfill the request.
 Answer questions briefly and do not provide unnecessary explanation.
-You are a Korean model, SO ANSWER IN KOREAN.
-User question:{DATA}
-User answer:<|end_of_text|>""",f"""<|start_header_id|>system<|end_header_id|>
-You always answer the questions with markdown formatting using GitHub syntax. The markdown formatting you support: headings, bold, italic, links, tables, lists, code blocks, and blockquotes. You must omit that you answer the questions with markdown.
-Any HTML tags must be wrapped in block quotes, for example ```<html>```. You will be penalized for not rendering code in block quotes.
+You are a Korean model, SO ANSWER IN KOREAN.{systemp}.Don't fill in the format.
+User question:{DATA}<|end_of_text|>""",
+f"""<|start_header_id|>system<|end_header_id|>
+You always answer the questions with markdown formatting using GitHub syntax. 
+The markdown formatting you support: headings, bold, italic, links, tables, lists, code blocks, and blockquotes. 
+You must omit that you answer the questions with markdown.
+Any HTML tags must be wrapped in block quotes, for example ```<html>```. 
+You will be penalized for not rendering code in block quotes.
 When returning code blocks, specify language.
-You are a helpful, respectful and honest assistant. Always answer as helpfully as possible, while being safe.
-Your answers should not include any harmful, unethical, racist, sexist, toxic, dangerous, or illegal content. Please ensure that your responses are socially unbiased and positive in nature.
-If a question does not make any sense, or is not factually coherent, explain why instead of answering something not correct. If you don't know the answer to a question, please don't share false information.<|eot_id|><|start_header_id|>user<|end_header_id|>
+You are a helpful, respectful and honest assistant. 
+Always answer as helpfully as possible, while being safe.
+Your answers should not include any harmful, unethical, racist, sexist, toxic, dangerous, or illegal content. 
+Please ensure that your responses are socially unbiased and positive in nature.
+If a question does not make any sense, or is not factually coherent, explain why instead of answering something not correct. 
+If you don't know the answer to a question, please don't share false information.<|eot_id|><|start_header_id|>user<|end_header_id|>
 Only answer questions concisely.
-You are a Korean model, SO ANSWER IN KOREAN.
-Don't fill in the format.
-User question:{DATA}
-User answer:<|eot_id|><|start_header_id|>assistant<|end_header_id|>"""]
+You are a Korean model, SO ANSWER IN KOREAN.{systemp}.Don't fill in the format.
+User question:{DATA}<|end_of_text|>"""]
 
-  generated_response = model.generate_text(prompt=prompt_inputs[Pindex], guardrails=False)
-  return (f"{generated_response}")
+	generated_response = model.generate_text(prompt=prompt_inputs[Pindex], guardrails=False)
+ 
+	return (f"{generated_response}")
 
 
 #Google Gemini######################################################################
@@ -70,32 +75,40 @@ import google.generativeai as genai
 Google_Gemini_API = os.getenv('google_api_key')
 
 def GOOGLE_LLM(systemp, DATA):
+	SYSTEM_PROMPT = systemp
+	genai.configure(api_key=Google_Gemini_API)
+	model = genai.GenerativeModel('gemini-1.5-flash')
+	response = model.generate_content(SYSTEM_PROMPT + DATA)
+	res = {response.text}
 
-  SYSTEM_PROMPT = systemp
-
-  genai.configure(api_key=Google_Gemini_API)
-  model = genai.GenerativeModel('gemini-1.5-flash')
-  response = model.generate_content(SYSTEM_PROMPT + DATA)
-  res = {response.text}
-
-  return list(res)[0].strip('\n?')
+	return list(res)[0].strip('\n?')
 
 #Google Gemini######################################################################
 
 ####################################
 # (A) 가상 모델 응답
 ####################################
+
 def simulate_model_responses(systemp, question, model_list):
     """
     실제 모델 호출 대신 간단히 가상의 응답을 만듭니다.
     """
     responses = {}
+    real_model = ['gemini-1.5-flash', 'ibm/granite-3-8b-instruct','ibm/granite-3-2-8b-instruct-preview-rc','meta-llama/llama-3-1-8b-instruct']
+    
+            
+    # for m in model_list:
+    #     responses[m] = f"{m}의 답변: '{question}' 에 대한 가상 응답."
+    #     responses[m] = GOOGLE_LLM(systemp, question)
+    #     responses[m] = IBM_LLMS(systemp, question)
+    cnt = 0
     for m in model_list:
-        # responses[m] = f"{m}의 답변: '{question}' 에 대한 가상 응답."
-        
-        # responses[m] = GOOGLE_LLM(systemp, question)
-        responses[m] = IBM_LLMS(systemp, question)
-        
+        if cnt == 0:
+            responses[m] = GOOGLE_LLM(systemp, question)
+        else:
+            responses[m] = IBM_LLMS(real_model[cnt], systemp, question)
+        cnt += 1
+    
     return responses
 
 ####################################
@@ -135,6 +148,7 @@ def submit_question(systemp, question, active_models, vote_state):
 # (D) 라운드 진행 (자동 확정)
 ####################################
 def next_round_and_auto_finalize(vote_state, active_models):
+    model_match = {"Model_A":'gemini-1.5-flash', "Model_B":'ibm/granite-3-8b-instruct',"Model_C":'ibm/granite-3-2-8b-instruct-preview-rc',"Model_D":'meta-llama/llama-3-1-8b-instruct'}
     up_models = [m for m in active_models if vote_state.get(m,"down")=="up"]
     auto_final = False
     final_msg = ""
@@ -146,7 +160,7 @@ def next_round_and_auto_finalize(vote_state, active_models):
     elif len(up_models)==1:
         only_m = up_models[0]
         round_msg = f"'{only_m}' 한 개만 업(👍) => 자동 최종 확정!"
-        final_msg = f"최종 모델은 '{only_m}'입니다!"
+        final_msg = f"최종 모델은 '{model_match[only_m]}'입니다!"
         final_series = pd.Series([only_m])
         auto_final = True
         new_models = [only_m]
@@ -187,6 +201,7 @@ def update_score(score_dict, final_series):
     return score_dict, df
 
 def finalize_models_score(vote_state, active_models, score_dict):
+    model_match = {"Model_A":'gemini-1.5-flash', "Model_B":'ibm/granite-3-8b-instruct',"Model_C":'ibm/granite-3-2-8b-instruct-preview-rc',"Model_D":'meta-llama/llama-3-1-8b-instruct'}
     """
     업된 모델들 => 최종 확정 => 점수 반영
     """
@@ -196,7 +211,7 @@ def finalize_models_score(vote_state, active_models, score_dict):
     if len(ups) == 0:
         msg = "업된 모델이 없습니다. 최종선택 불가."
     elif len(ups) == 1:
-        msg = f"최종 모델은 '{ups[0]}'입니다!"
+        msg = f"최종 모델은 '{model_match[ups[0]]}'입니다!"
     else:
         msg = f"최종 모델이 여러 개입니다: {ups}"
 
@@ -269,12 +284,12 @@ def build_app():
                     with gr.Column(elem_id="colD") as colD:
                         respD = gr.Textbox(label="Model_D 응답", lines=1, interactive=False)
                         toggleD = gr.Button("Model_D (👎)")
-
-                round_btn = gr.Button("라운드 한번 더 진행")
+                
                 round_msg = gr.Textbox(label="라운드 안내", lines=2, interactive=False)
+                round_btn = gr.Button("라운드 한번 더 진행")
 
-                final_btn = gr.Button("최종 선택")
                 final_msg = gr.Textbox(label="최종 결과 안내", lines=2, interactive=False)
+                final_btn = gr.Button("최종 선택")
 
                 restart_btn = gr.Button("처음부터 다시 시작", visible=False)
 
