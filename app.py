@@ -17,6 +17,7 @@ IBM_Cloud_API = os.getenv('api_key')
 IBM_Project_ID = os.getenv('project_id')
 
 
+
 def IBM_LLMS(ibm_model,systemp,DATA):
 	# ibm_model = 'ibm/granite-3-8b-instruct'
 	ibm_models=['ibm/granite-3-8b-instruct','ibm/granite-3-2-8b-instruct-preview-rc','meta-llama/llama-3-1-8b-instruct']
@@ -319,6 +320,9 @@ def build_app():
                 restart_btn = gr.Button("처음부터 다시 시작", visible=False)
 
             # Leaderboard 탭
+            
+            # import page2
+            
             with gr.Tab("Your Leaderboard"):
                 gr.Markdown("## 나만의 리더보드 화면 (Scoreboard)")
                 # States
