@@ -361,7 +361,7 @@ def build_app():
             # import page2
             
             with gr.Tab("Your Leaderboard"):
-                gr.Markdown("## 나만의 리더보드 화면 (Scoreboard)")
+                gr.Markdown("## 🏆나만의 리더보드 화면 (Scoreboard)")
                 # States
                 init_models = ["Model_A","Model_B","Model_C","Model_D"]
                 active_models_state = gr.State(init_models)
