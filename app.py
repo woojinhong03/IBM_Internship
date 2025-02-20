@@ -307,16 +307,17 @@ def build_app():
 # 사용 모델 정보(key model granite 3v)
                 gr.Markdown("### 📋 LLM 모델 성능 비교 테이블")
 
-                data = [
-            ["Granite-3-8B-Instruct", "8B", "128,000 tokens", "4096"],
+                scoreboard_df1 = gr.Dataframe(
+                headers=["모델명", "파라미터 개수", "컨텍스트 크기", "임베딩 크기"],
+                datatype=["str","str",'str','str'],
+                value=[["Granite-3-8B-Instruct", "8B", "128,000 tokens", "4096"],
             ["Granite-3.2-8B-Instruct-Preview", "8B", "128,000 tokens", "4096"],
             ["Meta-Llama-3-8B", "8B", "128,000 tokens", "4096"],
-            ["Gemini 1.5 Flash-8B", "8B", "1,048,576 tokens", "2048"]
-        ]
-        
-                headers = ["모델명", "파라미터 개수", "컨텍스트 크기", "임베딩 크기"]
-        
-                gr.Dataframe(data, headers=headers, interactive=False)
+            ["Gemini 1.5 Flash-8B", "8B", "1,048,576 tokens", "2048"]],
+                label="리더보드",
+                interactive=False
+              )
+                scoreboard_df1
 
                 gr.Image("image.png", label="📊 LLM 모델 비교 분석")
             # Vote 탭
