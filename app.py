@@ -4,7 +4,11 @@ import pandas as pd
 from dotenv import load_dotenv
 import os
 
-#IBM_Cloud##########################################################################
+
+####################################
+# IBM_Cloud 모델 불러오기
+####################################
+
 from ibm_watsonx_ai.metanames import GenTextParamsMetaNames as GenParams
 from ibm_watsonx_ai.foundation_models.utils.enums import DecodingMethods
 from ibm_watsonx_ai import Credentials
@@ -16,10 +20,7 @@ load_dotenv()
 IBM_Cloud_API = os.getenv('api_key')
 IBM_Project_ID = os.getenv('project_id')
 
-
-
 def IBM_LLMS(ibm_model,systemp,DATA):
-	# ibm_model = 'ibm/granite-3-8b-instruct'
 	ibm_models=['ibm/granite-3-8b-instruct','ibm/granite-3-2-8b-instruct-preview-rc','meta-llama/llama-3-1-8b-instruct']
 	Pindex=0 if ibm_models.index(ibm_model)<=1 else ibm_models.index(ibm_model)-1
 	credentials = Credentials(
@@ -40,6 +41,7 @@ def IBM_LLMS(ibm_model,systemp,DATA):
     	credentials = credentials,
     	project_id = IBM_Project_ID,
     )
+ 
 # 기본 시스템 프롬프트 정의
 	prompt_inputs = [f"""
 <|start_of_role|>system<|end_of_role|>
@@ -71,7 +73,10 @@ User question:{DATA}<|end_of_text|>"""]
 	return (f"{generated_response}")
 
 
-#Google Gemini######################################################################
+####################################
+# Google_Gemini 모델 불러오기
+####################################
+
 import google.generativeai as genai
 Google_Gemini_API = os.getenv('google_api_key')
 
@@ -84,63 +89,10 @@ def GOOGLE_LLM(systemp, DATA):
 
 	return list(res)[0].strip('\n?')
 
-#Google Gemini######################################################################
 
 ####################################
-# (A) 가상 모델 응답
+# 질문 보내기
 ####################################
-
-def simulate_model_responses(systemp, question, model_list):
-    """
-    실제 모델 호출 대신 간단히 가상의 응답을 만듭니다.
-    """
-    responses = {}
-    real_model = ['gemini-1.5-flash', 'ibm/granite-3-8b-instruct','ibm/granite-3-2-8b-instruct-preview-rc','meta-llama/llama-3-1-8b-instruct']
-    
-            
-    # for m in model_list:
-    #     responses[m] = f"{m}의 답변: '{question}' 에 대한 가상 응답."
-    #     responses[m] = GOOGLE_LLM(systemp, question)
-    #     responses[m] = IBM_LLMS(systemp, question)
-    cnt = 0
-    for m in model_list:
-        if cnt == 0:
-            responses[m] = GOOGLE_LLM(systemp, question)
-        else:
-            responses[m] = IBM_LLMS(real_model[cnt], systemp, question)
-        cnt += 1
-    
-    return responses
-
-####################################
-# (B) 업/다운 토글
-####################################
-def toggle_vote(vote_state, model):
-#     """
-#     - vote_state = { "Model_A": "down"/"up", ... }
-#     - 클릭 시 현재 상태를 토글, 버튼 라벨 반영
-#     """
-#     current = vote_state.get(model, "down")
-#     new_val = "up" if current == "down" else "down"
-#     vote_state[model] = new_val
-
-#     emoji = "👍" if new_val == "up" else "👎"
-#     label = f"{model} ({emoji})"
-#     return vote_state, label
-    current = vote_state.get(model, "❌")  # 기본값을 "X"로 설정
-    new_val = "⭕" if current == "❌" else "❌"  # O/X로 토글
-    vote_state[model] = new_val
-
-    emoji = "⭕" if new_val == "⭕" else "❌"  # O/X 이모지로 변경
-    label = f"{model} ({emoji})"
-    
-    return vote_state, label
-
-
-####################################
-# (C) 질문 보내기
-####################################
-
 
 def submit_question(systemp, question, active_models, vote_state):
     if not question.strip():
@@ -154,30 +106,39 @@ def submit_question(systemp, question, active_models, vote_state):
 
     return rA, rB, rC, rD, vote_state
 
+
 ####################################
-# (D) 라운드 진행 (자동 확정)
+# 가상 모델 응답
 ####################################
+
+def simulate_model_responses(systemp, question, model_list):
+    """
+    실제 모델 호출 대신 간단히 가상의 응답을 만듭니다.
+    """
+    responses = {}
+    real_model = ['gemini-1.5-flash', 'ibm/granite-3-8b-instruct','ibm/granite-3-2-8b-instruct-preview-rc','meta-llama/llama-3-1-8b-instruct']
+
+    cnt = 0
+    for m in model_list:
+        if cnt == 0:
+            responses[m] = GOOGLE_LLM(systemp, question)
+        else:
+            responses[m] = IBM_LLMS(real_model[cnt], systemp, question)
+        cnt += 1
+    
+    return responses
+
+
+####################################
+# 라운드 진행 (자동 확정)
+####################################
+
 def next_round_and_auto_finalize(vote_state, active_models):
     model_match = {"Model_A":'gemini-1.5-flash', "Model_B":'ibm/granite-3-8b-instruct',"Model_C":'ibm/granite-3-2-8b-instruct-preview-rc',"Model_D":'meta-llama/llama-3-1-8b-instruct'}
-    # up_models = [m for m in active_models if vote_state.get(m,"down")=="up"]
     up_models = [m for m in active_models if vote_state.get(m, "❌") == "⭕"]
     auto_final = False
     final_msg = ""
     final_series = pd.Series([], dtype=object)
-
-    # if len(up_models)==0:
-    #     round_msg = "현재 라운드에서 업(👍)된 모델이 없습니다. 모두 탈락."
-    #     new_models = []
-    # elif len(up_models)==1:
-    #     only_m = up_models[0]
-    #     round_msg = f"'{only_m}' 한 개만 업(👍) => 자동 최종 확정!"
-    #     final_msg = f"최종 모델은 '{model_match[only_m]}'입니다!"
-    #     final_series = pd.Series([only_m])
-    #     auto_final = True
-    #     new_models = [only_m]
-    # else:
-    #     round_msg = f"업(👍)된 모델: {up_models}"
-    #     new_models = up_models
     
     if len(up_models) == 0:
         round_msg = "현재 라운드에서 '⭕'된 모델이 없습니다. 모두 탈락."
@@ -209,10 +170,27 @@ def next_round_and_auto_finalize(vote_state, active_models):
         auto_final,
         show_restart
     )
+    
 
 ####################################
-# (E) 리더보드 갱신
+# 업/다운 토글
 ####################################
+
+def toggle_vote(vote_state, model):
+    current = vote_state.get(model, "❌")  # 기본값을 "X"로 설정
+    new_val = "⭕" if current == "❌" else "❌"  # O/X로 토글
+    vote_state[model] = new_val
+
+    emoji = "⭕" if new_val == "⭕" else "❌"  # O/X 이모지로 변경
+    label = f"{model} ({emoji})"
+    
+    return vote_state, label
+
+
+####################################
+# 리더보드 갱신
+####################################
+
 def update_score(score_dict, final_series):
     """
     final_series 내 모델들 => +1점
@@ -230,7 +208,6 @@ def finalize_models_score(vote_state, active_models, score_dict):
     """
     업된 모델들 => 최종 확정 => 점수 반영
     """
-    # ups = [m for m in active_models if vote_state.get(m,"down")=="up"]
     ups = [m for m in active_models if vote_state.get(m, "❌") == "⭕"]
     final_series = pd.Series(ups, dtype=object)
 
@@ -249,9 +226,11 @@ def finalize_models_score(vote_state, active_models, score_dict):
 
     return msg, final_series, auto_final, show_restart, new_score, new_df
 
+
 ####################################
-# (F) 처음부터 다시 시작 (점수 유지)
+# 처음부터 다시 시작 (점수 유지)
 ####################################
+
 def restart_all_but_keep_score(active_models, vote_state, final_series):
     """투표 상태만 초기화, 점수 그대로"""
     init_models = ["Model_A","Model_B","Model_C","Model_D"]
@@ -278,9 +257,11 @@ def restart_all_but_keep_score(active_models, vote_state, final_series):
         hide_restart
     )
 
+
 ####################################
-# (G) 메인 App (Tabs: Vote / Leaderboard)
+# 메인 App (Tabs: Vote / Leaderboard)
 ####################################
+
 def build_app():
     with gr.Blocks() as demo:
         with gr.Tabs():
@@ -292,6 +273,7 @@ def build_app():
                             "### - 질문을 보낸 후 답변을 기준으로 평가하세요.\n"
                             "### - 업/다운 상태 변환을 통하여 자유롭게 평가 할 수 있습니다.\n"
                             "### - 최종 선택 버튼을 클릭 시 제출됩니다.")
+                big_block = gr.HTML("""<embed src="https://olbyung.grafana.net/d-solo/eedl7jgui5kaob/stack-bar-chart?orgId=1&from=1739994145944&to=1740015745944&timezone=browser&panelId=1&__feature.dashboardSceneSolo" width="450" height="200" frameborder="0">""")
                 with gr.Row():
                     user_question = gr.Textbox(label="질문을 입력하세요", lines=1)
                     systemp = gr.Textbox(label="추가할 시스템 프로젝트를 입력하세요", lines=1)
@@ -328,7 +310,6 @@ def build_app():
                 # States
                 init_models = ["Model_A","Model_B","Model_C","Model_D"]
                 active_models_state = gr.State(init_models)
-                # vote_state = gr.State({m:"down" for m in init_models})
                 vote_state = gr.State({m: "❌" for m in init_models})  # 기본값 "X"
                 final_series_state = gr.State(pd.Series([], dtype=object))
                 auto_finalized_state = gr.State(False)
@@ -352,10 +333,6 @@ def build_app():
         )
 
         # (2) 업/다운 토글
-        # toggleA.click(fn=lambda vs:toggle_vote(vs,"Model_A"), inputs=[vote_state], outputs=[vote_state, toggleA])
-        # toggleB.click(fn=lambda vs:toggle_vote(vs,"Model_B"), inputs=[vote_state], outputs=[vote_state, toggleB])
-        # toggleC.click(fn=lambda vs:toggle_vote(vs,"Model_C"), inputs=[vote_state], outputs=[vote_state, toggleC])
-        # toggleD.click(fn=lambda vs:toggle_vote(vs,"Model_D"), inputs=[vote_state], outputs=[vote_state, toggleD])
         toggleA.click(fn=lambda vs: toggle_vote(vs, "Model_A"), inputs=[vote_state], outputs=[vote_state, toggleA])
         toggleB.click(fn=lambda vs: toggle_vote(vs, "Model_B"), inputs=[vote_state], outputs=[vote_state, toggleB])
         toggleC.click(fn=lambda vs: toggle_vote(vs, "Model_C"), inputs=[vote_state], outputs=[vote_state, toggleC])
