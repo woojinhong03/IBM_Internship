@@ -9,4 +9,7 @@ app_file: app.py
 pinned: false
 ---
 
-Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference
+#2025 WINTER IBM P-TECH INTERNSHIP
+##TEAM1
+
+https://huggingface.co/spaces/howozn/IBM_Internship
