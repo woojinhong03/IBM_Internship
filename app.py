@@ -136,7 +136,7 @@ def build_app() :
                     datatype=["str","number"],
                     value=[],
                     label="리더보드",
-                    interactive=False
+                    interactive=True
                 )
 
                 scoreboard_df
