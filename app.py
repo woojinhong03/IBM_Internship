@@ -2,7 +2,6 @@
 import gradio as gr
 import pandas as pd
 import utils.interaction
-import utils.data
 
 ####################################
 # 메인 App (Tabs: Vote / Leaderboard)
@@ -148,18 +147,39 @@ def build_app() :
 
                 scoreboard_df
                 
-                test_df = gr.Dataframe(
-                    headers=["test"],
-                    datatype=["str"],
-                    value=[utils.data.dataf],
-                    label="test",
+            with gr.Tab("ALL Leaderboard") :
+                gr.Markdown("## 🏆전체 리더보드 화면 (Scoreboard)") 
+                   
+                import gspread
+                # 위에서 키 정보 들이 담겨있던 JSON 파일 경로를 `json_file_path` 변수에 넣습니다.
+                json_file_path = "google.json"
+                gc = gspread.service_account(json_file_path)
+                spreadsheet_url = "'https://docs.google.com/spreadsheets/d/1rj3nwKG1bn6gr4T2hCNEU9ycnENQaat3UbF9KL-PfG8/edit?usp=sharing'"
+                doc = gc.open_by_url(spreadsheet_url)
+
+                worksheet = doc.worksheet("test1")
+                data = worksheet.acell('B2').value
+                data = int(data) + 1
+                worksheet.update([[data]], 'B2')
+                
+                # worksheet.update([['API 테스트5']], 'A1')
+                # data = worksheet.acell('A2').value
+                # gr.Markdown(data)
+                
+                scoreboard_df_2 = gr.Dataframe(
+                    headers=["Model","Score"],
+                    datatype=["str","number"],
+                    value=[[worksheet.acell('A2').value,worksheet.acell('B2').value],
+                           [worksheet.acell('A3').value,worksheet.acell('B3').value],
+                           [worksheet.acell('A4').value,worksheet.acell('B4').value],
+                           [worksheet.acell('A5').value,worksheet.acell('B5').value]],
+                    label="리더보드",
                     interactive=True
                 )
-                
-                test_df
 
-                gr.Markdown("당신이 테스트한 점수를 여기서 확인하세요. 투표는 Vote 탭에서 진행 가능합니다.")
+                scoreboard_df_2
 
+             
         # (1) 질문 보내기
         submit_btn.click(
             fn=utils.interaction.submit_question,
