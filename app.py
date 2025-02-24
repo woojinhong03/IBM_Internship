@@ -191,7 +191,7 @@ def build_app() :
                     "client_x509_cert_url": g_client_x509_cert_url,
                     "universe_domain": "googleapis.com"
                 }
-                # data = json.dumps(data)
+                
                 gc = gspread.service_account_from_dict(data)
                 spreadsheet_url = "https://docs.google.com/spreadsheets/d/1rj3nwKG1bn6gr4T2hCNEU9ycnENQaat3UbF9KL-PfG8/edit?usp=sharing"
                 doc = gc.open_by_url(spreadsheet_url)

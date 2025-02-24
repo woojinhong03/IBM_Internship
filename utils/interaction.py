@@ -80,18 +80,6 @@ def toggle_vote(vote_state, model):
 # 리더보드 갱신
 ####################################
 
-def update_score(score_dict, final_series):
-    """
-    final_series 내 모델들 => +1점
-    """
-    if not final_series.empty:
-        for m in final_series:
-            score_dict[m] = score_dict.get(m, 0) + 1
-
-    df = pd.DataFrame(list(score_dict.items()), columns=["Model","Score"])
-    df.sort_values(by="Score", ascending=False, inplace=True)
-    return score_dict, df
-
 def finalize_models_score(vote_state, active_models, score_dict):
     model_match = {"Model_A":'gemini-1.5-flash', "Model_B":'ibm/granite-3-8b-instruct',"Model_C":'ibm/granite-3-2-8b-instruct-preview-rc',"Model_D":'meta-llama/llama-3-1-8b-instruct'}
     """
@@ -115,6 +103,18 @@ def finalize_models_score(vote_state, active_models, score_dict):
 
     return msg, final_series, auto_final, show_restart, new_score, new_df
 
+def update_score(score_dict, final_series):
+    """
+    final_series 내 모델들 => +1점
+    """
+    if not final_series.empty:
+        for m in final_series:
+            score_dict[m] = score_dict.get(m, 0) + 1
+
+    df = pd.DataFrame(list(score_dict.items()), columns=["Model","Score"])
+    df.sort_values(by="Score", ascending=False, inplace=True)
+    
+    return score_dict, df
 
 ####################################
 # 처음부터 다시 시작 (점수 유지)
