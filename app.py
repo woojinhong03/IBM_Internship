@@ -154,11 +154,6 @@ def build_app() :
                     [worksheet.acell('A4').value, worksheet.acell('B4').value],
                     [worksheet.acell('A5').value, worksheet.acell('B5').value]
                 ]
-            
-            def test():
-                data = worksheet.acell('B2').value
-                data = int(data) + 1
-                worksheet.update([[data]], 'B2')
 
             with gr.Tab("ALL Leaderboard"):
                 gr.Markdown("## 🏆전체 리더보드 화면 (Scoreboard)") 
@@ -205,12 +200,10 @@ def build_app() :
                     interactive=True
                 )
                 
+                
                 with gr.Row():
                     refresh_btn = gr.Button("데이터 갱신")
                     refresh_btn.click(fn=fetch_data, outputs=leaderboard)
-                    
-                    test_bt = gr.Button("입력")
-                    test_bt.click(fn=test)
                 
 
                 
@@ -247,8 +240,21 @@ def build_app() :
 
         # (4) 최종 선택 -> 점수 갱신
         def finalize_wrapper(vs, am, sc):
-            msg, fseries, af, rst_btn, new_sc, new_df = utils.interaction.finalize_models_score(vs, am, sc)
+            msg, fseries, af, rst_btn, new_sc, new_df, dap = utils.interaction.finalize_models_score(vs, am, sc)
 
+            data = worksheet.get_all_values()
+            positions = []
+            for row_idx, row in enumerate(data, start=1):  # Google Sheets는 1-based index 사용
+                for col_idx, cell in enumerate(row, start=1):
+                    if cell == dap:
+                        positions.append(row_idx)
+            
+            po = 'B' + str(positions[0])
+            x = worksheet.acell(po).value
+            x = int(x) + 1
+            worksheet.update([[x]], po)
+            
+            
             return msg, fseries, af, rst_btn, new_sc, new_df
 
         final_btn.click(

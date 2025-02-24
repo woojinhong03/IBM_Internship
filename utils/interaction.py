@@ -92,6 +92,8 @@ def finalize_models_score(vote_state, active_models, score_dict):
         msg = "업된 모델이 없습니다. 최종선택 불가."
     elif len(ups) == 1:
         msg = f"최종 모델은 '{model_match[ups[0]]}'입니다!"
+        dap = model_match[ups[0]]
+        
     else:
         msg = f"최종 모델이 여러 개입니다: {ups}"
 
@@ -101,7 +103,12 @@ def finalize_models_score(vote_state, active_models, score_dict):
     # 점수 업데이트
     new_score, new_df = update_score(score_dict, final_series)
 
-    return msg, final_series, auto_final, show_restart, new_score, new_df
+    return msg, final_series, auto_final, show_restart, new_score, new_df, dap
+
+
+
+
+
 
 def update_score(score_dict, final_series):
     """
