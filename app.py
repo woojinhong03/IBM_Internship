@@ -158,9 +158,6 @@ def build_app() :
                 doc = gc.open_by_url(spreadsheet_url)
 
                 worksheet = doc.worksheet("test1")
-                data = worksheet.acell('B2').value
-                data = int(data) + 1
-                worksheet.update([[data]], 'B2')
                 
                 # worksheet.update([['API 테스트5']], 'A1')
                 # data = worksheet.acell('A2').value
@@ -176,8 +173,23 @@ def build_app() :
                     label="리더보드",
                     interactive=True
                 )
-
+                
+                def test():
+                    data = worksheet.acell('B2').value
+                    data = int(data) + 1
+                    worksheet.update([[data]], 'B2')
+                    
+                submit_btna = gr.Button("test")
+                submit_btna.click(
+                    fn = test
+                )
+                
+                gr.HTML("<iframe src='https://docs.google.com/spreadsheets/d/e/2PACX-1vTAw9823lbZINz8dqcawG42r0swb4jJfVK4J6zDyJzchhaiaBvp9m8ysV64WpUdftK2Hdf468o-jMA0/pubhtml?gid=0&amp;single=true&amp;widget=true&amp;headers=false'></iframe>")
+                
+                
                 scoreboard_df_2
+                
+                
 
              
         # (1) 질문 보내기
