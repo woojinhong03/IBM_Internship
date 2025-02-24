@@ -147,48 +147,45 @@ def build_app() :
 
                 scoreboard_df
                 
-            with gr.Tab("ALL Leaderboard") :
+            def fetch_data():
+                return [
+                    [worksheet.acell('A2').value, worksheet.acell('B2').value],
+                    [worksheet.acell('A3').value, worksheet.acell('B3').value],
+                    [worksheet.acell('A4').value, worksheet.acell('B4').value],
+                    [worksheet.acell('A5').value, worksheet.acell('B5').value]
+                ]
+            
+            def test():
+                data = worksheet.acell('B2').value
+                data = int(data) + 1
+                worksheet.update([[data]], 'B2')
+
+            with gr.Tab("ALL Leaderboard"):
                 gr.Markdown("## 🏆전체 리더보드 화면 (Scoreboard)") 
-                   
+                
                 import gspread
-                # 위에서 키 정보 들이 담겨있던 JSON 파일 경로를 `json_file_path` 변수에 넣습니다.
                 json_file_path = "google.json"
                 gc = gspread.service_account(json_file_path)
-                spreadsheet_url = "'https://docs.google.com/spreadsheets/d/1rj3nwKG1bn6gr4T2hCNEU9ycnENQaat3UbF9KL-PfG8/edit?usp=sharing'"
+                spreadsheet_url = "https://docs.google.com/spreadsheets/d/1rj3nwKG1bn6gr4T2hCNEU9ycnENQaat3UbF9KL-PfG8/edit?usp=sharing"
                 doc = gc.open_by_url(spreadsheet_url)
-
                 worksheet = doc.worksheet("test1")
-                
-                # worksheet.update([['API 테스트5']], 'A1')
-                # data = worksheet.acell('A2').value
-                # gr.Markdown(data)
-                
-                scoreboard_df_2 = gr.Dataframe(
+                    
+                leaderboard = gr.Dataframe(
                     headers=["Model","Score"],
                     datatype=["str","number"],
-                    value=[[worksheet.acell('A2').value,worksheet.acell('B2').value],
-                           [worksheet.acell('A3').value,worksheet.acell('B3').value],
-                           [worksheet.acell('A4').value,worksheet.acell('B4').value],
-                           [worksheet.acell('A5').value,worksheet.acell('B5').value]],
+                    value=fetch_data(),
                     label="리더보드",
                     interactive=True
                 )
                 
-                def test():
-                    data = worksheet.acell('B2').value
-                    data = int(data) + 1
-                    worksheet.update([[data]], 'B2')
+                with gr.Row():
+                    refresh_btn = gr.Button("데이터 갱신")
+                    refresh_btn.click(fn=fetch_data, outputs=leaderboard)
                     
-                submit_btna = gr.Button("test")
-                submit_btna.click(
-                    fn = test
-                )
+                    test_bt = gr.Button("입력")
+                    test_bt.click(fn=test)
                 
-                gr.HTML("<iframe src='https://docs.google.com/spreadsheets/d/e/2PACX-1vTAw9823lbZINz8dqcawG42r0swb4jJfVK4J6zDyJzchhaiaBvp9m8ysV64WpUdftK2Hdf468o-jMA0/pubhtml?gid=0&amp;single=true&amp;widget=true&amp;headers=false'></iframe>")
-                
-                
-                scoreboard_df_2
-                
+
                 
 
              
