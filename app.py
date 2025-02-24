@@ -175,6 +175,9 @@ def build_app() :
                 g_client_id = os.getenv('g_client_id')
                 g_client_x509_cert_url = os.getenv('g_client_x509_cert_url')
                 
+                if g_private_key:
+                    g_private_key = g_private_key.replace('\\n', '\n')
+                
                 data = {
                     "type": "service_account",
                     "project_id": g_project_id,
