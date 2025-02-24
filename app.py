@@ -162,8 +162,36 @@ def build_app() :
 
             with gr.Tab("ALL Leaderboard"):
                 gr.Markdown("## 🏆전체 리더보드 화면 (Scoreboard)") 
-                
+                import json
                 import gspread
+                import os
+                from dotenv import load_dotenv
+                
+                load_dotenv()
+                g_project_id = os.getenv('g_project_id')
+                g_private_key_id = os.getenv('g_private_key_id')
+                g_private_key = os.getenv('g_private_key')
+                g_client_email = os.getenv('g_client_email')
+                g_client_id = os.getenv('g_client_id')
+                g_client_x509_cert_url = os.getenv('g_client_x509_cert_url')
+                
+                data = {
+                    "type": "service_account",
+                    "project_id": g_project_id,
+                    "private_key_id": g_private_key_id,
+                    "private_key": g_private_key,
+                    "client_email": g_client_email,
+                    "client_id": g_client_id,
+                    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+                    "token_uri": "https://oauth2.googleapis.com/token",
+                    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+                    "client_x509_cert_url": g_client_x509_cert_url,
+                    "universe_domain": "googleapis.com"
+                }
+                file_path = 'google.json'
+                with open(file_path, 'w') as f:
+                    json.dump(data, f)
+                
                 json_file_path = "google.json"
                 gc = gspread.service_account(json_file_path)
                 spreadsheet_url = "https://docs.google.com/spreadsheets/d/1rj3nwKG1bn6gr4T2hCNEU9ycnENQaat3UbF9KL-PfG8/edit?usp=sharing"
