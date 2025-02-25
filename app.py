@@ -55,7 +55,7 @@ def build_app() :
         """)
 
 # 사용 모델 정보(key model granite 3v)
-                gr.Markdown("### 📋 LLM 모델 성능 비교 테이블")
+                gr.Markdown("**📋 LLM 모델 성능 비교 테이블**")
 
                 scoreboard_df1 = gr.Dataframe(
                     headers=["모델명", "파라미터 개수", "컨텍스트 크기", "임베딩 크기"],
@@ -249,7 +249,6 @@ def build_app() :
                     headers=["Model","Score"],
                     datatype=["str","number"],
                     value=fetch_data(),
-                    label="리더보드",
                     interactive=True
                 )
                 sort
