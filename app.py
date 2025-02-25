@@ -241,7 +241,10 @@ def build_app() :
                 spreadsheet_url = "https://docs.google.com/spreadsheets/d/1rj3nwKG1bn6gr4T2hCNEU9ycnENQaat3UbF9KL-PfG8/edit?usp=sharing"
                 doc = gc.open_by_url(spreadsheet_url)
                 worksheet = doc.worksheet("test1")
-                    
+                
+                def sort(i):
+                    return i.sort('Score')
+                
                 leaderboard = gr.Dataframe(
                     headers=["Model","Score"],
                     datatype=["str","number"],
@@ -249,6 +252,8 @@ def build_app() :
                     label="리더보드",
                     interactive=True
                 )
+                sort
+                
                 
                 
                 with gr.Row():
@@ -312,6 +317,7 @@ def build_app() :
             inputs=[vote_state, active_models_state],
             outputs=[final_msg, final_series_state, auto_finalized_state, restart_btn]
         )
+        final_btn.click(fn=fetch_data, outputs=leaderboard)
 
         # (5) 처음부터 -> 투표만 리셋
         def restart_wrapper(am, vs, fs):
