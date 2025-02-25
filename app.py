@@ -292,6 +292,18 @@ def build_app() :
                 restart_btn
             ]
         )
+        round_btn.click(
+            fn=lambda vs: utils.interaction.toggle_vote(vs, "Model_A"), inputs=[vote_state], outputs=[vote_state, toggleA],
+        )
+        round_btn.click(
+            fn=lambda vs: utils.interaction.toggle_vote(vs, "Model_B"), inputs=[vote_state], outputs=[vote_state, toggleB],
+        )
+        round_btn.click(
+            fn=lambda vs: utils.interaction.toggle_vote(vs, "Model_C"), inputs=[vote_state], outputs=[vote_state, toggleC],
+        )
+        round_btn.click(
+            fn=lambda vs: utils.interaction.toggle_vote(vs, "Model_D"), inputs=[vote_state], outputs=[vote_state, toggleD],
+        )
 
         # (4) 최종 선택 -> 점수 갱신
         def finalize_wrapper(vs, am):
@@ -334,7 +346,18 @@ def build_app() :
                 restart_btn
             ]
         )
-
+        restart_btn.click(
+            fn=lambda vs: utils.interaction.toggle_vote(vs, "Model_A"), inputs=[vote_state], outputs=[vote_state, toggleA],
+        )
+        restart_btn.click(
+            fn=lambda vs: utils.interaction.toggle_vote(vs, "Model_B"), inputs=[vote_state], outputs=[vote_state, toggleB],
+        )
+        restart_btn.click(
+            fn=lambda vs: utils.interaction.toggle_vote(vs, "Model_C"), inputs=[vote_state], outputs=[vote_state, toggleC],
+        )
+        restart_btn.click(
+            fn=lambda vs: utils.interaction.toggle_vote(vs, "Model_D"), inputs=[vote_state], outputs=[vote_state, toggleD],
+        )
     return demo
 
 if __name__=="__main__":

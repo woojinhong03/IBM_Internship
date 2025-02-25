@@ -35,7 +35,7 @@ def next_round_and_auto_finalize(vote_state, active_models):
     elif len(up_models) == 1:
         only_m = up_models[0]
         round_msg = f"'{only_m}' 한 개만 '⭕' => 자동 최종 확정!"
-        final_msg = f"최종 모델은 '{model_match[only_m]}'입니다!"
+        final_msg = f"최종 선택하신 모델은 '{model_match[only_m]}'입니다! \nLeaderboard 탭에 점수가 추가되었습니다 :)"
         final_series = pd.Series([only_m])
         auto_final = True
         new_models = [only_m]
@@ -91,7 +91,7 @@ def finalize_models_score(vote_state, active_models):
     if len(ups) == 0:
         msg = "업된 모델이 없습니다. 최종선택 불가."
     elif len(ups) == 1:
-        msg = f"최종 모델은 '{model_match[ups[0]]}'입니다!"
+        msg = f"최종 선택하신 모델은 '{model_match[ups[0]]}'입니다! \nLeaderboard 탭에 점수가 추가되었습니다 :)"
         dap = model_match[ups[0]]
         
     else:
