@@ -32,7 +32,7 @@ def build_app() :
                     
                     &nbsp; 이에 따라, 저희는 새로운 리더보드를 만들자 라는 결론에 도달했습니다. 기준은 다음과 같습니다.
                     
-                    1. 정량적 지표 기반 평가 결과물이 아닌 **사용자들이 실제로 체감하는 만족도 기반**의 **새로운 평가 지표**를 만들자. 
+                    1. 정량적 지표 기반 평가 결과물이 아닌 **사용자들이 실제로 체감하는 만족도 평가**와 정량적 평가를 섞은 **새로운 평가 지표**를 만들자. 
                     2. **한국어**를 기준으로 성능을 평가하자.
                     
                     또한, 저희의 평가 결과와 별개로 사용자들이 직접 모델을 체험하고 평가함으로써 **자신에게 가장 적합한 모델**을 찾을 수 있도록 돕는 것이 목표입니다.
@@ -67,22 +67,11 @@ def build_app() :
                     <br/>
                     
                     ## 평가하기  
-                    
-                    ✅ **평가 선정 이유**  
-                    해당 평가 방식을 선정한 이유는 **한국어에 대한 정량적 평가 지표**가 **영어에 대한 정량적 평가 지표**보다 적어서입니다.  
-                    정성적 평가 지표의 경우 정량적 지표에서 나온 점수와 다르게 **사용자가 사용하며 느끼는 느낌**에 더 중점을 두었습니다.  
-                    해당 평가를 통해 정량적 평가 데이터로 나온 데이터와 다른 결과가 도출되면서 꼭 **정량적 평가가 정답은 아닌 것**을 설명합니다.  
-                    
-                    📌 **평가 방식**
-                    - 사람이 직접 평가하는 **Human Evaluation** 방식을 사용합니다.
-                    - 동일한 지문과 질문을 입력한 후, 답변을 기반으로 비교합니다.
 
-                    ✅ **모델 평가 기준**
-                    - **정보 정확도** : 답변에 포함된 정보가 정확한가?  <span style="color:#999999">ex) 크리스마스는 12월 24일 입니다.</span>
-                    - **문장 완성도** : 문장이 자연스러운 흐름과 적절한 어휘로 이루어져있는가?  <span style="color:#999999">ex) 내일은 금요일이야. 학교 갈 준비하세요?</span>
-                    - **문해력** : 사용자의 질문을 정확하게 이해하였는가?  <span style="color:#999999">ex) 내 질문에 대하여 이해한 바를 요약해줘 -> (잘못된 정보로 요약)</span>
-                    - **논리적 근거** : 정답에 대한 뒷받침이 되는 설명을 추출하는 능력  <span style="color:#999999">ex) O:제가 이렇게 생각한 근거는 ~</span>
-                                
+                    ✅ **평가 선정 이유**  
+                    저희는 정량적 평가와 정성적 평가를 둘 다 실행했습니다.  
+                    정성적 평가 지표의 경우 정량적 지표에서 나온 점수와 다르게 **사용자가 사용하며 느끼는 느낌**에 더 중점을 두었습니다.  
+                      
                     🚀 **정량적 평가 방법**
                     - **ROUGE-1** : 단어(uni-gram) 기반 일치율
                     - **ROUGE-L** : 문장 내에서 가장 긴 일치하는 서열(Longest Common Subsequence, LCS) 기반 점수
@@ -90,9 +79,17 @@ def build_app() :
                     &nbsp; &nbsp; &nbsp; &nbsp; <span style="color:#999999">Precision - 모델이 정답으로 출력한 부분에서 실제로 맞은 정답 비율</span>  
                     &nbsp; &nbsp; &nbsp; &nbsp; <span style="color:#999999">Recall - 실제 정답 중 모델이 놓친 비율</span>
                     - **TF-IDF** : 요약 능력 평가  
-                                    
-                    📌 **정성적 평가 방법**  
-                    - **Human Evaluation** 
+                      
+                    📌 **정성적 평가 방법**
+                    1. 동일한 지문과 질문을 여러 모델에 입력합니다.
+                    2. 모델명이 블라인드 된 답변이 생성됩니다.
+                    3. 사람이 직접 평가하는 **Human Evaluation** 방식으로 기준에 따라 평가합니다.
+
+                    ✅ **모델 평가 기준**
+                    - **정보 정확도** : 답변에 포함된 정보가 정확한가?  <span style="color:#999999">ex) 크리스마스는 12월 24일 입니다.</span>
+                    - **문장 완성도** : 문장이 자연스러운 흐름과 적절한 어휘로 이루어져있는가?  <span style="color:#999999">ex) 내일은 금요일이야. 학교 갈 준비하세요?</span>
+                    - **문해력** : 사용자의 질문을 정확하게 이해하였는가?  <span style="color:#999999">ex) 내 질문에 대하여 이해한 바를 요약해줘 -> (잘못된 정보로 요약)</span>
+                    - **논리적 근거** : 정답에 대한 뒷받침이 되는 설명을 추출하는 능력  <span style="color:#999999">ex) O:제가 이렇게 생각한 근거는 ~</span>
                       
                     <br/>
                 """)
@@ -106,12 +103,12 @@ def build_app() :
 
                     gr.Markdown("""
                         🔑 **(1) Key Model**  
-                        정량적 평가에선 정답에 한 글자라도 틀리다면 틀린 것으로 표시하기 때문에 점수가 낮게 나오는 것을 확인할 수 있습니다.  
+                        정량적 평가는 정답에 한 글자라도 틀리다면 틀린 것으로 간주하기 때문에 점수가 낮게 나오는 것을 확인할 수 있습니다.  
                         **Key Model**인 **Granite v3** 모델과 비교해 큰 차이가 확인되지 않지만, **TF-IDF** 지표에서 **Gemini 1.5 flash** 모델보다 점수가 10% 정도 높게 나오는 것을 알 수 있습니다.  
                         해당 결과로 나오는 이유는 **TF-IDF** 평가 방식이 지문에서 많은 문장을 인용할수록 높은 점수를 주는 방식이기 떄문입니다.  
                         **LLAMA v3.1** 모델의 경우 **TF-IDF** 점수가 타 모델에 비해 유독 높게 나오는데 해당 사유는 앞서 위에서 설명한 **TF-IDF** 방식이  
                         지문에서 가장 많은 문장을 인용한 부분에서 점수를 주기 떄문에 **LLAMA v3.1** 모델의 점수가 높게 나오는 것을 확인할 수 있습니다.  
-                        **Granite v3**와 **Gemini 1.5 flash** 모델의 성능 차이가 약 9% 정도 나오는 것을 확인할 수 있습니다.  
+                        **Granite v3**와 **Gemini 1.5 flash** 모델의 성능 차이가 약 9% 정ㅊ도 나오는 것을 확인할 수 있습니다.  
                         해당 지표를 통해 **Gemini 1.5 flash** 모델의 수치가 높게 나오는 것은 해당 모델이 배포 되기 전 단계에서 조정된 것으로 추측하고 있습니다.
                                     
                         📈 **(2) Top Model**  
@@ -151,9 +148,15 @@ def build_app() :
                     # gr.Image("img/")
 
                     gr.Markdown("""
+                        ---
                         ## 결론
-                        위와 같은 평가를 통해 모든 모델에 RAG 탑재, 파인튜닝, 하이퍼 파라미터 수정, 프롬프트 튜닝 등으로 모델의 성능을 15 ~ 20%(튜닝 후 평균 향상률) 향상 시킨다면  
-                        **Granite v3** 모델이 이미 튜닝된 **Gemini 1.5 flash** 모델의 성능과 동급으로 분류되거나, 그 이상의 성능을 보여줄 것으로 예측됩니다.
+                        해당 평가를 통해 저희는 다음과 같은 결론을 내릴 수 있습니다.
+                        1. 시중의 정량적 평가 지표와 저희의 정량적 평가 지표 간의 차이를 통해 **"모델의 한국어 성능은 영어 성능과 차이가 있다"** 는 점을 설명 할 수 있습니다.
+                        2. 저희의 정량적 평가 결과와 정성적 평가 결과 간의 차이를 통해 **"정량적 평가만이 절대적인 기준은 아니다"** 는 점을 확인할 수 있습니다.  
+                        3. 위 결과를 종합해 볼 때, 모든 모델에 RAG 탑재, 파인튜닝, 하이퍼 파라미터 수정, 프롬프트 튜닝 등을 적용하여 모델 성능을 15 ~ 20%(튜닝 후 평균 향상률) 향상시킨다면,  
+                        &nbsp; &nbsp; **IBM의 Granite** 모델이 이미 튜닝된 **Gemini 1.5 flash** 모델의 성능과 동급으로 분류되거나 **그 이상의 성능을 발휘할 것으로 예측**됩니다.  
+                        <br/>  
+                        <br/>  
                     """)
                     
                 with gr.Blocks() as endding :
@@ -309,18 +312,6 @@ def build_app() :
                 restart_btn
             ]
         )
-        # round_btn.click(
-        #     fn=lambda vs: utils.interaction.toggle_vote(vs, "Model_B"), inputs=[vote_state], outputs=[vote_state, toggleB],
-        # )
-        # round_btn.click(
-        #     fn=lambda vs: utils.interaction.toggle_vote(vs, "Model_B"), inputs=[vote_state], outputs=[vote_state, toggleB],
-        # )
-        # round_btn.click(
-        #     fn=lambda vs: utils.interaction.toggle_vote(vs, "Model_C"), inputs=[vote_state], outputs=[vote_state, toggleC],
-        # )
-        # round_btn.click(
-        #     fn=lambda vs: utils.interaction.toggle_vote(vs, "Model_D"), inputs=[vote_state], outputs=[vote_state, toggleD],
-        # )
 
         # (4) 최종 선택 -> 점수 갱신
         def finalize_wrapper(vs, am):
@@ -363,18 +354,6 @@ def build_app() :
                 restart_btn
             ]
         )
-        # restart_btn.click(
-        #     fn=lambda vs: utils.interaction.toggle_vote(vs, "Model_A"), inputs=[vote_state], outputs=[vote_state, toggleA],
-        # )
-        # restart_btn.click(
-        #     fn=lambda vs: utils.interaction.toggle_vote(vs, "Model_B"), inputs=[vote_state], outputs=[vote_state, toggleB],
-        # )
-        # restart_btn.click(
-        #     fn=lambda vs: utils.interaction.toggle_vote(vs, "Model_C"), inputs=[vote_state], outputs=[vote_state, toggleC],
-        # )
-        # restart_btn.click(
-        #     fn=lambda vs: utils.interaction.toggle_vote(vs, "Model_D"), inputs=[vote_state], outputs=[vote_state, toggleD],
-        # )
     return demo
 
 if __name__=="__main__":
