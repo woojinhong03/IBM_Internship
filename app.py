@@ -55,7 +55,7 @@ def build_app() :
                         ["Granite-3.2-8B-Instruct-Preview", "8B", "128,000 tokens", "4096"],
                         ["Meta-Llama-3-8B", "8B", "128,000 tokens", "4096"],
                         ["Gemini 1.5 Flash-8B", "8B", "1,048,576 tokens", "2048"],
-                        ["Mixtral 8x7B version 1", "8x7B", "", "4096"]
+                        ["Mixtral 8x7B version 1", "8x7B", "32,000 tokens", "4096"]
                     ],
                     interactive=False
                 )
