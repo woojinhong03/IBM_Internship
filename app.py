@@ -17,16 +17,18 @@ def build_app() :
             with gr.Tab("Main") :
                 gr.Markdown("""
                     # 🏢 LLM 성능 비교 프로젝트  
+                    <br/>
+                      
                       
                     &nbsp; 이 프로젝트는 **LLM의 성능을 비교**하는 것이 주 목적이며,  
                     특히 **한국어 사용 성능**을 비교,분석하는 것을 목표로 합니다.
                                         
-                    시중에는 LLM을 비교하는 다양한 지표가 존재합니다.   
+                    시중에는 이미 LLM을 비교하는 다양한 지표가 존재합니다.   
                     하지만 일상 생활 속에서 여러 LLM들을 직접 사용해본 결과, **지표(리더보드)의 순위와 다른 성능을 보이는 경우가 많았습니다.**  
                     이유를 분석해 보니 대표적으로 두 가지가 있었습니다.
                     
                     1. **정량적 결과물**만을 활용한 지표가 대부분이다.
-                    2. **영어 기반 평가**라 한국어 사용시의 성능은 고려되지 않았다.
+                    2. **영어 기반 평가**이기 때문에 한국어 사용시의 성능은 고려되지 않았다.
                     
                     &nbsp; 이에 따라, 저희는 새로운 리더보드를 만들자 라는 결론에 도달했습니다. 기준은 다음과 같습니다.
                     
@@ -96,14 +98,14 @@ def build_app() :
                 """)
                 
                 with gr.Blocks() as Image_of :
-                    gr.Markdown("""## ⚖️ 정량적 평가 지표""")
+                    gr.Markdown("""## 정량적 평가 지표""")
 
                     with gr.Row() :
-                        gr.Image("img/정량적평가(KeyModel).png", label = "Key Model")
-                        gr.Image("img/상위모델포함 정량평가.png", label = "Top Model")
+                        gr.Image("img/정량적평가(KeyModel).png", label = "(1) Key Model")
+                        gr.Image("img/상위모델포함 정량평가.png", label = "(2) Top Model")
 
                     gr.Markdown("""
-                        🔑 **Key Model**  
+                        🔑 **(1) Key Model**  
                         정량적 평가에선 정답에 한 글자라도 틀리다면 틀린 것으로 표시하기 때문에 점수가 낮게 나오는 것을 확인할 수 있습니다.  
                         **Key Model**인 **Granite v3** 모델과 비교해 큰 차이가 확인되지 않지만, **TF-IDF** 지표에서 **Gemini 1.5 flash** 모델보다 점수가 10% 정도 높게 나오는 것을 알 수 있습니다.  
                         해당 결과로 나오는 이유는 **TF-IDF** 평가 방식이 지문에서 많은 문장을 인용할수록 높은 점수를 주는 방식이기 떄문입니다.  
@@ -112,33 +114,37 @@ def build_app() :
                         **Granite v3**와 **Gemini 1.5 flash** 모델의 성능 차이가 약 9% 정도 나오는 것을 확인할 수 있습니다.  
                         해당 지표를 통해 **Gemini 1.5 flash** 모델의 수치가 높게 나오는 것은 해당 모델이 배포 되기 전 단계에서 조정된 것으로 추측하고 있습니다.
                                     
-                        📈 **Top Model**  
+                        📈 **(2) Top Model**  
                         **Top Model** 지표를 참고하면, Top 모델인 **Mixtral 8x7 v1**의 성능과 **Granite v3**와 약 10% 정도의 성능 차이가 나는 것을 확인할 수 있습니다.  
                         **Gemini 1.5 flash** 모델과 Top 모델을 비교하면 **Gemini 1.5 flash** 모델이 Top 모델보다 **Rouge-1과 Rouge-L** 평가 부분에서  
                         **Gemini 1.5 flash**가 약 3% 정도 높다는 것을 확인할 수 있습니다.  
-                        그 외에 사항으론 Top 모델이 **Gemini 1.5 flash** 5% 정도 앞서고 있다는 것을 확인할 수 있습니다.  
+                        그 외에 사항으론 Top 모델이 **Gemini 1.5 flash** 5% 정도 앞서고 있다는 것을 확인할 수 있습니다. 
+                      
+                        <br/> 
                     """)
 
                 with gr.Blocks() as Image:
-                    gr.Markdown("""## ✏️ 정성적 평가 지표""")
+                    gr.Markdown("""## 정성적 평가 지표""")
 
                     with gr.Row():
-                        gr.Image("img/모델별 총합 수치.png", label = "Total Score")
-                        gr.Image("img/정성평가(KeyModel).png", label = "Key Model")
-                        gr.Image("img/상위모델포함 정성평가.png", label = "Top model")
+                        gr.Image("img/모델별 총합 수치.png", label = "(1) Total Score")
+                        gr.Image("img/정성평가(KeyModel).png", label = "(2) Key Model")
+                        gr.Image("img/상위모델포함 정성평가.png", label = "(3) Top model")
                         
                     gr.Markdown("""
-                        📊 **Total Score**  
+                        📊 **(1) Total Score**  
                         위 지표 중 **Total Score 지표**의 경우 각 정성 평가의 항목 점수를 모두 더한 값으로 **Gemini 1.5 flash** 모델이 가장 높은 수치가 나온 것을 보여줍니다.  
                         **Gemini 1.5 flash** 모델이 정량적 평가에서 말했듯, 배포 되기 전 단계에서 조정된 것으로 사용자들에게 더 나은 성능으로 느껴지게 만드는 것을 볼 수 있습니다.
                             
-                        🔑 **Key Model**  
+                        🔑 **(2) Key Model**  
                         IBM LLM과 타 사 LLM 성능을 비교하기 위해 **Granite v3** 모델을 Key Model로 선정하였습니다.  
                         위 지표를 통해 **Total Score**와 비슷한 내용으로 **Gemini 1.5 flash** 모델이 사용자에게 기본 모델보다 10% 정도 좋다는 의견을 볼 수 있습니다.  
                                     
-                        📈 **Top Model**  
+                        📈 **(3) Top Model**  
                         파라미터의 수가 더 많은 모델과 비교 했을 때 조정된 모델인 **Gemini 1.5 flash**이 약 560개의 파라미터 개수를 가진  **Mixtral 8x7 v1** 모델과 성능이 비슷하다는 결론이 나왔습니다.  
                         **Gemini 1.5 flash** 모델은 폐쇄형 모델이기 떄문에 정확한 정보는 알 수 없지만, 해당 결과를 통해 **Gemini 1.5 flash** 모델은 어느정도 조정이 되어 있다고 추측할 수 있을 것 같습니다.  
+
+                        <br/>
                     """)
                     
                 with gr.Blocks() as final :
@@ -146,8 +152,8 @@ def build_app() :
 
                     gr.Markdown("""
                         ## 결론
-                        위와 같은 평가를 통해 미세조정, RAG 탑재, 파인튜닝, 하이퍼 파라미터 수정 등으로 **Granite v3** 모델의 성능을 15 ~ 20% 정도로 향상 시킨다면 
-                        **Gemini 1.5 flash** 모델의 성능과 동급으로 분류되거나, 그 이상의 성능을 보여줄 것으로 생각됩니다.
+                        위와 같은 평가를 통해 모든 모델에 RAG 탑재, 파인튜닝, 하이퍼 파라미터 수정, 프롬프트 튜닝 등으로 모델의 성능을 15 ~ 20%(튜닝 후 평균 향상률) 향상 시킨다면  
+                        **Granite v3** 모델이 이미 튜닝된 **Gemini 1.5 flash** 모델의 성능과 동급으로 분류되거나, 그 이상의 성능을 보여줄 것으로 예측됩니다.
                     """)
                     
                 with gr.Blocks() as endding :
@@ -303,18 +309,18 @@ def build_app() :
                 restart_btn
             ]
         )
-        round_btn.click(
-            fn=lambda vs: utils.interaction.toggle_vote(vs, "Model_A"), inputs=[vote_state], outputs=[vote_state, toggleA],
-        )
-        round_btn.click(
-            fn=lambda vs: utils.interaction.toggle_vote(vs, "Model_B"), inputs=[vote_state], outputs=[vote_state, toggleB],
-        )
-        round_btn.click(
-            fn=lambda vs: utils.interaction.toggle_vote(vs, "Model_C"), inputs=[vote_state], outputs=[vote_state, toggleC],
-        )
-        round_btn.click(
-            fn=lambda vs: utils.interaction.toggle_vote(vs, "Model_D"), inputs=[vote_state], outputs=[vote_state, toggleD],
-        )
+        # round_btn.click(
+        #     fn=lambda vs: utils.interaction.toggle_vote(vs, "Model_B"), inputs=[vote_state], outputs=[vote_state, toggleB],
+        # )
+        # round_btn.click(
+        #     fn=lambda vs: utils.interaction.toggle_vote(vs, "Model_B"), inputs=[vote_state], outputs=[vote_state, toggleB],
+        # )
+        # round_btn.click(
+        #     fn=lambda vs: utils.interaction.toggle_vote(vs, "Model_C"), inputs=[vote_state], outputs=[vote_state, toggleC],
+        # )
+        # round_btn.click(
+        #     fn=lambda vs: utils.interaction.toggle_vote(vs, "Model_D"), inputs=[vote_state], outputs=[vote_state, toggleD],
+        # )
 
         # (4) 최종 선택 -> 점수 갱신
         def finalize_wrapper(vs, am):
@@ -357,18 +363,18 @@ def build_app() :
                 restart_btn
             ]
         )
-        restart_btn.click(
-            fn=lambda vs: utils.interaction.toggle_vote(vs, "Model_A"), inputs=[vote_state], outputs=[vote_state, toggleA],
-        )
-        restart_btn.click(
-            fn=lambda vs: utils.interaction.toggle_vote(vs, "Model_B"), inputs=[vote_state], outputs=[vote_state, toggleB],
-        )
-        restart_btn.click(
-            fn=lambda vs: utils.interaction.toggle_vote(vs, "Model_C"), inputs=[vote_state], outputs=[vote_state, toggleC],
-        )
-        restart_btn.click(
-            fn=lambda vs: utils.interaction.toggle_vote(vs, "Model_D"), inputs=[vote_state], outputs=[vote_state, toggleD],
-        )
+        # restart_btn.click(
+        #     fn=lambda vs: utils.interaction.toggle_vote(vs, "Model_A"), inputs=[vote_state], outputs=[vote_state, toggleA],
+        # )
+        # restart_btn.click(
+        #     fn=lambda vs: utils.interaction.toggle_vote(vs, "Model_B"), inputs=[vote_state], outputs=[vote_state, toggleB],
+        # )
+        # restart_btn.click(
+        #     fn=lambda vs: utils.interaction.toggle_vote(vs, "Model_C"), inputs=[vote_state], outputs=[vote_state, toggleC],
+        # )
+        # restart_btn.click(
+        #     fn=lambda vs: utils.interaction.toggle_vote(vs, "Model_D"), inputs=[vote_state], outputs=[vote_state, toggleD],
+        # )
     return demo
 
 if __name__=="__main__":
