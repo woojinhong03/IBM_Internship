@@ -60,7 +60,8 @@ def build_app() :
                         ["Gemini 1.5 Flash-8B", "8B", "1,048,576 tokens", "2048"],
                         ["Mixtral 8x7B version 1", "8x7B", "32,000 tokens", "4096"]
                     ],
-                    interactive=False
+                    interactive=False,
+                    wrap= True
                 )
                 scoreboard_df1
                 
@@ -272,7 +273,8 @@ def build_app() :
                     headers=["Model","Score"],
                     datatype=["str","number"],
                     value=fetch_data(),
-                    interactive=True
+                    interactive=True,
+                    wrap= True
                 )
                 sort
                 
